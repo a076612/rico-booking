@@ -609,217 +609,154 @@ async function loadSlots(){
    建立預約
 ===================================================== */
 
-async function submitBooking(){
+async function submitBooking() {
 
   const name =
-    document.getElementById('name')
-      .value
-      .trim();
-
+    document.getElementById('name').value.trim();
 
   const phone =
-    document.getElementById('phone')
-      .value
-      .trim();
-
+    document.getElementById('phone').value.trim();
 
   const start =
-    document.getElementById('slot')
-      .value;
+    document.getElementById('slot').value;
 
+  const err =
+    document.getElementById('error');
 
-  const button =
+  const btn =
     document.getElementById('submitBtn');
 
-
-  showError('');
-
+  err.textContent = '';
 
   const cleanPhone =
-    phone.replace(/\D/g,'');
+    phone.replace(/\D/g, '');
 
+  // ===== 基本驗證 =====
 
-  /*
-   * 姓名
-   */
-
-  if(!name){
-
-    showError(
-      '請輸入姓名。'
-    );
-
+  if (!name) {
+    err.textContent = '請輸入姓名。';
     return;
-
   }
 
-
-  /*
-   * 手機
-   */
-
-  if(!/^09\d{8}$/.test(cleanPhone)){
-
-    showError(
-      '請輸入正確的 10 碼手機號碼，例如 0912345678。'
-    );
-
+  if (!/^09\d{8}$/.test(cleanPhone)) {
+    err.textContent =
+      '請輸入正確的 10 碼手機號碼，例如 0912345678。';
     return;
-
   }
 
-
-  /*
-   * 時段
-   */
-
-  if(!start){
-
-    showError(
-      '請選擇預約時段。'
-    );
-
+  if (!start) {
+    err.textContent =
+      '請選擇預約時段。';
     return;
-
   }
 
-
-  /*
-   * Token
-   */
-
-  if(!TOKEN){
-
-    showError(
-      'LINE 預約身分尚未建立，請重新開啟預約頁面。'
-    );
-
+  if (!TOKEN) {
+    err.textContent =
+      'LINE 預約連結尚未建立，請重新開啟預約頁面。';
     return;
-
   }
 
+  // ===== 防止重複按鈕 =====
 
-  button.disabled = true;
+  btn.disabled = true;
+  btn.textContent = '預約處理中…';
 
-  button.textContent =
-    '預約處理中…';
-
-
-  try{
+  try {
 
     const url =
-      GAS_API_URL +
-      '?api=submitBooking' +
+      'https://script.google.com/macros/s/' +
+      'AKfycbyvvtOVFJPce3CdEZJ7QEfdnm0Ia6nziNpDN42_uhkfbersVE534Ty8tFJ1Sc1ku_xy' +
+      '/exec';
 
-      '&name=' +
-      encodeURIComponent(name) +
+    const params = new URLSearchParams();
 
-      '&phone=' +
-      encodeURIComponent(cleanPhone) +
-
-      '&start=' +
-      encodeURIComponent(start) +
-
-      '&token=' +
-      encodeURIComponent(TOKEN);
-
-
-    const response =
-      await fetch(url);
-
-
-    if(!response.ok){
-
-      throw new Error(
-        '預約 API 錯誤：' +
-        response.status
-      );
-
-    }
-
-
-    const result =
-      await response.json();
-
+    params.append('api', 'submitBooking');
+    params.append('name', name);
+    params.append('phone', cleanPhone);
+    params.append('start', start);
+    params.append('token', TOKEN);
 
     console.log(
-      'submitBooking result:',
-      result
+      '開始送出預約：',
+      {
+        name: name,
+        phone: cleanPhone,
+        start: start,
+        token: TOKEN ? '有 TOKEN' : '無 TOKEN'
+      }
     );
 
+    const response =
+      await fetch(url + '?' + params.toString());
 
-    if(!result.ok){
+    console.log(
+      'Apps Script HTTP 狀態：',
+      response.status
+    );
 
+    if (!response.ok) {
       throw new Error(
-        result.error ||
-        '預約失敗'
+        '伺服器回應錯誤：HTTP ' +
+        response.status
       );
-
     }
 
+    const res =
+      await response.json();
 
-    /*
-     * 顯示成功畫面
-     */
+    console.log(
+      'submitBooking 回傳：',
+      res
+    );
+
+    // ===== 後端判定失敗 =====
+
+    if (!res.ok) {
+      throw new Error(
+        res.error ||
+        '預約失敗，請重新選擇時段。'
+      );
+    }
+
+    // ===== 預約成功 =====
 
     document.getElementById(
       'formCard'
-    ).style.display =
-      'none';
-
+    ).style.display = 'none';
 
     document.getElementById(
       'successCard'
-    ).style.display =
-      'block';
-
+    ).style.display = 'block';
 
     document.getElementById(
       'successText'
     ).innerHTML =
-
       '預約編號：<strong>' +
-      result.bookingNo +
+      res.bookingNo +
       '</strong><br><br>' +
-
       '⏰ ' +
-      result.start +
+      res.start +
       '–' +
-      result.end;
+      res.end;
 
-
-  }
-
-  catch(error){
+  } catch (e) {
 
     console.error(
-      'submitBooking 錯誤',
-      error
+      'submitBooking 錯誤：',
+      e
     );
 
+    err.textContent =
+      e.message ||
+      '預約失敗，請重新選擇時段。';
 
-    showError(
-      '❌ 預約失敗：\n' +
-      (error.message || error)
-    );
+    btn.disabled = false;
+    btn.textContent = '確認預約';
 
-
-    button.disabled = false;
-
-    button.textContent =
-      '確認預約';
-
-
-    /*
-     * 重新取得最新時段
-     */
-
+    // 重新取得最新名額
     loadSlots();
-
   }
-
 }
-
 
 
 /* =====================================================
