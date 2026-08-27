@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>10分鐘免費按摩體驗</title>
+
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+  <style>
+    body {
+      font-family:
+        Arial,
+        "Noto Sans TC",
+        sans-serif;
+
+      background: #f7f5f2;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+    .wrap {
+      max-width: 560px;
+      margin: auto;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 4px 18px rgba(0,0,0,.08);
+    }
+
+    h1 {
+      font-size: 24px;
+      margin: 0 0 20px;
+    }
+
+    .status {
+      background: #faf7ef;
+      border-radius: 12px;
+      padding: 16px;
+      line-height: 1.7;
+      word-break: break-word;
+    }
+
+    .success {
+      color: #16803c;
+    }
+
+    .error {
+      color: #b42318;
+    }
+
+    .small {
+      color: #777;
+      font-size: 13px;
+      margin-top: 15px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+  <div class="card">
+
+    <h1>10分鐘免費按摩體驗</h1>
+
+    <div
+      id="status"
+      class="status"
+    >
+      ① 開始初始化 LINE…
+    </div>
+
+    <div
+      id="detail"
+      class="small"
+    ></div>
+
+  </div>
+
+</div>
+
+<script>
+
+const LIFF_ID = '2011276461-dzqaRMGb';
+
+const statusEl =
+  document.getElementById('status');
+
+const detailEl =
+  document.getElementById('detail');
+
+
+async function initLIFF() {
+
+  try {
+
+    statusEl.textContent =
+      '① LIFF SDK 載入成功，開始初始化…';
+
+
+    console.log(
+      'LIFF ID:',
+      LIFF_ID
+    );
+
+
+    console.log(
+      '目前網址:',
+      window.location.href
+    );
+
+
+    await liff.init({
+
+      liffId: LIFF_ID
+
+    });
+
+
+    statusEl.textContent =
+      '② LIFF 初始化成功！';
+
+
+    statusEl.className =
+      'status success';
+
+
+    console.log(
+      'LIFF 初始化成功'
+    );
+
+
+    const inClient =
+      liff.isInClient();
+
+
+    const loggedIn =
+      liff.isLoggedIn();
+
+
+    const version =
+      liff.getVersion();
+
+
+    detailEl.innerHTML =
+
+      'LINE App 內：' +
+      inClient +
+      '<br>' +
+
+      'LINE 登入狀態：' +
+      loggedIn +
+      '<br>' +
+
+      'LIFF SDK：' +
+      version +
+      '<br><br>' +
+
+      '目前網址：<br>' +
+      window.location.href;
+
+
+  } catch (err) {
+
+    console.error(
+      'LIFF 初始化失敗：',
+      err
+    );
+
+
+    statusEl.textContent =
+      '❌ LIFF 初始化失敗：' +
+      (err.message || err);
+
+
+    statusEl.className =
+      'status error';
+
+
+    detailEl.textContent =
+      '請開啟瀏覽器 Console 查看詳細錯誤。';
+
+  }
+
+}
+
+
+initLIFF();
+
+</script>
+
+</body>
+</html>
