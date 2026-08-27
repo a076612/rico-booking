@@ -663,9 +663,9 @@ async function submitBooking() {
 
   try {
 
-    const url =
-     GAS_API_URL;
-    
+    // 使用統一的 GAS API URL
+    const url = GAS_API_URL;
+
     const params = new URLSearchParams();
 
     params.append('api', 'submitBooking');
@@ -685,7 +685,9 @@ async function submitBooking() {
     );
 
     const response =
-      await fetch(url + '?' + params.toString());
+      await fetch(
+        url + '?' + params.toString()
+      );
 
     console.log(
       'Apps Script HTTP 狀態：',
@@ -744,15 +746,15 @@ async function submitBooking() {
       e
     );
 
+    // ★ 不要在這裡呼叫 loadSlots()
+    // 否則真正的錯誤會被「⑦ 正在載入可預約時段…」蓋掉
+
     err.textContent =
-      e.message ||
-      '預約失敗，請重新選擇時段。';
+      '❌ 預約失敗：' +
+      (e.message || '未知錯誤');
 
     btn.disabled = false;
     btn.textContent = '確認預約';
-
-    // 重新取得最新名額
-    loadSlots();
   }
 }
 
