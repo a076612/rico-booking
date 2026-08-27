@@ -1,111 +1,106 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
-
 <head>
+  <meta charset="UTF-8">
 
-<meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
 
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1"
->
+  <title>10分鐘免費按摩體驗</title>
 
-<title>10分鐘免費按摩體驗</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
-<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    body{
+      font-family:Arial,"Noto Sans TC",sans-serif;
+      background:#f7f5f2;
+      margin:0;
+      padding:20px;
+      color:#333;
+    }
 
-<style>
+    .wrap{
+      max-width:560px;
+      margin:auto;
+    }
 
-body{
-  font-family:Arial,"Noto Sans TC",sans-serif;
-  background:#f7f5f2;
-  margin:0;
-  padding:20px;
-  color:#333;
-}
+    .card{
+      background:#fff;
+      border-radius:18px;
+      padding:24px;
+      box-shadow:0 4px 18px rgba(0,0,0,.08);
+    }
 
-.wrap{
-  max-width:560px;
-  margin:auto;
-}
+    h1{
+      font-size:24px;
+      margin:0 0 8px;
+    }
 
-.card{
-  background:#fff;
-  border-radius:18px;
-  padding:24px;
-  box-shadow:0 4px 18px rgba(0,0,0,.08);
-}
+    .sub{
+      color:#777;
+      margin-bottom:24px;
+    }
 
-h1{
-  font-size:24px;
-  margin:0 0 8px;
-}
+    label{
+      display:block;
+      font-weight:600;
+      margin:18px 0 8px;
+    }
 
-.sub{
-  color:#777;
-  margin-bottom:24px;
-}
+    input,
+    select{
+      width:100%;
+      box-sizing:border-box;
+      padding:13px;
+      border:1px solid #ddd;
+      border-radius:10px;
+      font-size:16px;
+      background:#fff;
+    }
 
-label{
-  display:block;
-  font-weight:600;
-  margin:18px 0 8px;
-}
+    button{
+      width:100%;
+      border:0;
+      border-radius:12px;
+      padding:14px;
+      font-size:17px;
+      font-weight:700;
+      background:#333;
+      color:#fff;
+      margin-top:22px;
+    }
 
-input,
-select{
-  width:100%;
-  box-sizing:border-box;
-  padding:13px;
-  border:1px solid #ddd;
-  border-radius:10px;
-  font-size:16px;
-  background:#fff;
-}
+    button:disabled{
+      opacity:.5;
+    }
 
-button{
-  width:100%;
-  border:0;
-  border-radius:12px;
-  padding:14px;
-  font-size:17px;
-  font-weight:700;
-  background:#333;
-  color:#fff;
-  margin-top:22px;
-}
+    .notice{
+      background:#faf7ef;
+      border-radius:12px;
+      padding:14px;
+      line-height:1.7;
+      font-size:14px;
+      margin-top:18px;
+    }
 
-button:disabled{
-  opacity:.5;
-}
+    .success{
+      display:none;
+      text-align:center;
+    }
 
-.notice{
-  background:#faf7ef;
-  border-radius:12px;
-  padding:14px;
-  line-height:1.7;
-  font-size:14px;
-  margin-top:20px;
-}
+    .error{
+      color:#b42318;
+      margin-top:12px;
+      line-height:1.5;
+      white-space:pre-wrap;
+    }
 
-.success{
-  display:none;
-  text-align:center;
-}
-
-.error{
-  color:#b42318;
-  margin-top:12px;
-  line-height:1.5;
-}
-
-.loading{
-  color:#777;
-  margin-top:12px;
-}
-
-</style>
-
+    .loading{
+      color:#777;
+    }
+  </style>
 </head>
 
 
@@ -113,7 +108,9 @@ button:disabled{
 
 <div class="wrap">
 
+  <!-- ========================= -->
   <!-- 預約表單 -->
+  <!-- ========================= -->
 
   <div class="card" id="formCard">
 
@@ -146,11 +143,9 @@ button:disabled{
     <label>3. 預約時段</label>
 
     <select id="slot">
-
       <option value="">
         載入可預約時段中…
       </option>
-
     </select>
 
 
@@ -187,17 +182,12 @@ button:disabled{
       class="error"
     ></div>
 
-    <div
-      id="status"
-      class="loading"
-    >
-      ① 開始初始化 LINE…
-    </div>
-
   </div>
 
 
-  <!-- 成功畫面 -->
+  <!-- ========================= -->
+  <!-- 預約成功 -->
+  <!-- ========================= -->
 
   <div
     class="card success"
@@ -223,162 +213,87 @@ button:disabled{
 
 <script>
 
-
-/* ================================
+/* =====================================================
    基本設定
-================================ */
+===================================================== */
 
 const LIFF_ID =
   '2011276461-dzqaRMGb';
 
 
-const GAS_API =
+const GAS_API_URL =
   'https://script.google.com/macros/s/AKfycbyvvtOVFJPce3CdEZJ7QEfdnm0Ia6nziNpDN42_uhkfbersVE534Ty8tFJ1Sc1ku_xy/exec';
 
 
-let TOKEN = '';
-
 let LINE_ID_TOKEN = '';
 
-
-/* ================================
-   DOM
-================================ */
-
-const statusEl =
-  document.getElementById('status');
-
-const errorEl =
-  document.getElementById('error');
-
-const slotEl =
-  document.getElementById('slot');
-
-const submitBtn =
-  document.getElementById('submitBtn');
+let TOKEN = '';
 
 
-/* ================================
-   JSONP
-================================ */
 
-function jsonp(url){
+/* =====================================================
+   顯示錯誤
+===================================================== */
 
-  return new Promise(function(resolve,reject){
+function showError(message){
 
-    const callbackName =
-      'jsonp_' +
-      Date.now() +
-      '_' +
-      Math.floor(Math.random()*10000);
-
-    const script =
-      document.createElement('script');
-
-    const timeout =
-      setTimeout(function(){
-
-        cleanup();
-
-        reject(
-          new Error('API 連線逾時')
-        );
-
-      },15000);
-
-
-    function cleanup(){
-
-      clearTimeout(timeout);
-
-      if(script.parentNode){
-        script.parentNode.removeChild(script);
-      }
-
-      try{
-        delete window[callbackName];
-      }catch(e){
-        window[callbackName] = undefined;
-      }
-
-    }
-
-
-    window[callbackName] =
-      function(data){
-
-        cleanup();
-
-        resolve(data);
-
-      };
-
-
-    script.onerror =
-      function(){
-
-        cleanup();
-
-        reject(
-          new Error('無法連線至預約系統')
-        );
-
-      };
-
-
-    script.src =
-      url +
-      '&callback=' +
-      encodeURIComponent(callbackName);
-
-
-    document.body.appendChild(script);
-
-  });
+  document.getElementById('error').textContent =
+    message || '';
 
 }
 
 
-/* ================================
+
+/* =====================================================
    LIFF 初始化
-================================ */
+===================================================== */
 
 async function initLIFF(){
 
   try{
 
-    statusEl.textContent =
-      '① 開始初始化 LINE…';
+    showError('① 開始初始化 LINE…');
 
 
     await liff.init({
-
-      liffId:LIFF_ID,
-
-      withLoginOnExternalBrowser:true
-
+      liffId: LIFF_ID
     });
 
 
-    statusEl.textContent =
-      '② LIFF 初始化成功';
+    showError('② LIFF 初始化成功');
 
 
     console.log(
-      'LIFF App:',
-      liff.isInClient()
-    );
-
-    console.log(
-      'LIFF Login:',
+      'LIFF:',
+      liff.isInClient(),
       liff.isLoggedIn()
     );
 
 
+    /*
+     * 如果不是 LINE App
+     */
+
+    if(!liff.isInClient()){
+
+      showError(
+        '請從 LINE 官方帳號中的按鈕開啟預約頁面。'
+      );
+
+      return;
+
+    }
+
+
+    /*
+     * 如果尚未登入
+     */
+
     if(!liff.isLoggedIn()){
 
-      statusEl.textContent =
-        '③ 正在登入 LINE…';
+      showError(
+        '③ 尚未登入 LINE，準備登入…'
+      );
 
       liff.login();
 
@@ -387,9 +302,14 @@ async function initLIFF(){
     }
 
 
-    statusEl.textContent =
-      '③ LINE 登入成功';
+    showError(
+      '③ LINE 登入成功，取得身分資訊…'
+    );
 
+
+    /*
+     * 取得 LINE ID Token
+     */
 
     LINE_ID_TOKEN =
       liff.getIDToken();
@@ -398,307 +318,465 @@ async function initLIFF(){
     if(!LINE_ID_TOKEN){
 
       throw new Error(
-        '無法取得 LINE ID Token'
+        '無法取得 LINE ID Token。'
       );
 
     }
 
 
-    statusEl.textContent =
-      '④ LINE 身分驗證中…';
+    showError(
+      '④ LINE 身分驗證資訊取得成功'
+    );
 
 
-    await createToken();
+    /*
+     * 向 GAS 建立預約 Token
+     */
 
+    await createBookingToken();
 
-    statusEl.textContent =
-      '⑤ LINE 身分驗證成功';
-
-
-    await loadSlots();
-
-
-    statusEl.textContent =
-      '⑥ 預約時段載入完成';
 
   }
 
-  catch(err){
+  catch(error){
 
-    console.error(err);
+    console.error(
+      'LIFF 初始化錯誤',
+      error
+    );
 
-    statusEl.textContent =
-      '';
 
-    errorEl.textContent =
-      '❌ ' +
-      (err.message || err);
+    showError(
+      '❌ LINE 初始化失敗：\n' +
+      (error.message || error)
+    );
 
   }
 
 }
 
 
-/* ================================
+
+/* =====================================================
    建立預約 Token
-================================ */
+===================================================== */
 
-async function createToken(){
+async function createBookingToken(){
 
-  const url =
-    GAS_API +
-    '?api=createToken' +
-    '&idToken=' +
-    encodeURIComponent(
-      LINE_ID_TOKEN
+  try{
+
+    showError(
+      '⑤ 正在驗證 LINE 身分…'
     );
 
 
-  const result =
-    await jsonp(url);
+    const url =
+      GAS_API_URL +
+      '?api=createToken&idToken=' +
+      encodeURIComponent(LINE_ID_TOKEN);
 
 
-  console.log(
-    'createToken:',
-    result
-  );
+    const response =
+      await fetch(url);
 
 
-  if(
-    !result ||
-    !result.ok ||
-    !result.token
-  ){
+    if(!response.ok){
 
-    throw new Error(
-      result?.error ||
-      '無法建立預約連結'
+      throw new Error(
+        'Google Apps Script 回應錯誤：' +
+        response.status
+      );
+
+    }
+
+
+    const result =
+      await response.json();
+
+
+    console.log(
+      'createToken result:',
+      result
+    );
+
+
+    if(!result.ok){
+
+      throw new Error(
+        result.error ||
+        'LINE 身分驗證失敗'
+      );
+
+    }
+
+
+    TOKEN =
+      result.token;
+
+
+    if(!TOKEN){
+
+      throw new Error(
+        'Google Apps Script 沒有回傳預約 Token'
+      );
+
+    }
+
+
+    showError(
+      '⑥ LINE 身分驗證成功'
+    );
+
+
+    /*
+     * 驗證完成後載入時段
+     */
+
+    loadSlots();
+
+  }
+
+  catch(error){
+
+    console.error(
+      'createToken 錯誤',
+      error
+    );
+
+
+    showError(
+      '❌ LINE 身分驗證失敗：\n' +
+      (error.message || error)
     );
 
   }
 
-
-  TOKEN =
-    result.token;
-
 }
 
 
-/* ================================
-   載入時段
-================================ */
+
+/* =====================================================
+   載入預約時段
+===================================================== */
 
 async function loadSlots(){
 
-  slotEl.innerHTML =
-    '<option>載入可預約時段中…</option>';
+  const select =
+    document.getElementById('slot');
 
-  submitBtn.disabled = true;
+  const button =
+    document.getElementById('submitBtn');
 
 
-  const result =
-    await jsonp(
-      GAS_API +
-      '?api=getSlots'
+  try{
+
+    select.innerHTML =
+      '<option value="">正在取得預約時段…</option>';
+
+
+    button.disabled = true;
+
+
+    showError(
+      '⑦ 正在載入可預約時段…'
     );
 
 
-  console.log(
-    'getSlots:',
-    result
-  );
+    const url =
+      GAS_API_URL +
+      '?api=getSlots';
 
 
-  if(
-    !result ||
-    !result.ok
-  ){
+    const response =
+      await fetch(url);
 
-    throw new Error(
-      result?.error ||
-      '時段載入失敗'
+
+    if(!response.ok){
+
+      throw new Error(
+        '取得時段失敗 HTTP ' +
+        response.status
+      );
+
+    }
+
+
+    const result =
+      await response.json();
+
+
+    console.log(
+      'getSlots result:',
+      result
+    );
+
+
+    if(!result.ok){
+
+      throw new Error(
+        result.error ||
+        '無法取得預約時段'
+      );
+
+    }
+
+
+    const slots =
+      result.slots || [];
+
+
+    select.innerHTML =
+      '<option value="">請選擇預約時段</option>';
+
+
+    if(!slots.length){
+
+      select.innerHTML =
+        '<option value="">目前無可預約時段</option>';
+
+
+      showError(
+        '目前沒有可預約時段。'
+      );
+
+
+      return;
+
+    }
+
+
+    /*
+     * 建立時段選項
+     */
+
+    slots.forEach(function(slot){
+
+      const option =
+        document.createElement('option');
+
+
+      option.value =
+        slot.start;
+
+
+      option.textContent =
+        slot.start +
+        '–' +
+        slot.end +
+        '　剩餘 ' +
+        slot.remaining +
+        ' 名';
+
+
+      select.appendChild(option);
+
+    });
+
+
+    button.disabled = false;
+
+
+    showError(
+      '⑧ 可預約時段載入完成'
     );
 
   }
 
+  catch(error){
 
-  const slots =
-    result.slots || [];
+    console.error(
+      'getSlots 錯誤',
+      error
+    );
 
 
-  slotEl.innerHTML =
-    '<option value="">請選擇預約時段</option>';
+    select.innerHTML =
+      '<option value="">時段載入失敗</option>';
 
 
-  if(!slots.length){
-
-    slotEl.innerHTML =
-      '<option value="">目前無可預約時段</option>';
-
-    return;
+    showError(
+      '❌ 時段載入失敗：\n' +
+      (error.message || error)
+    );
 
   }
-
-
-  slots.forEach(function(s){
-
-    const option =
-      document.createElement('option');
-
-
-    option.value =
-      s.start;
-
-
-    option.textContent =
-      s.start +
-      '–' +
-      s.end +
-      '　剩餘 ' +
-      s.remaining +
-      ' 名';
-
-
-    slotEl.appendChild(option);
-
-  });
-
-
-  submitBtn.disabled = false;
 
 }
 
 
-/* ================================
-   提交預約
-================================ */
+
+/* =====================================================
+   建立預約
+===================================================== */
 
 async function submitBooking(){
 
-  errorEl.textContent = '';
-
-
   const name =
-    document
-      .getElementById('name')
+    document.getElementById('name')
       .value
       .trim();
 
 
   const phone =
-    document
-      .getElementById('phone')
+    document.getElementById('phone')
       .value
       .trim();
 
 
   const start =
-    slotEl.value;
+    document.getElementById('slot')
+      .value;
+
+
+  const button =
+    document.getElementById('submitBtn');
+
+
+  showError('');
 
 
   const cleanPhone =
     phone.replace(/\D/g,'');
 
 
+  /*
+   * 姓名
+   */
+
   if(!name){
 
-    errorEl.textContent =
-      '請輸入姓名。';
+    showError(
+      '請輸入姓名。'
+    );
 
     return;
 
   }
 
+
+  /*
+   * 手機
+   */
 
   if(!/^09\d{8}$/.test(cleanPhone)){
 
-    errorEl.textContent =
-      '請輸入正確的 10 碼手機號碼。';
+    showError(
+      '請輸入正確的 10 碼手機號碼，例如 0912345678。'
+    );
 
     return;
 
   }
 
+
+  /*
+   * 時段
+   */
 
   if(!start){
 
-    errorEl.textContent =
-      '請選擇預約時段。';
+    showError(
+      '請選擇預約時段。'
+    );
 
     return;
 
   }
 
+
+  /*
+   * Token
+   */
 
   if(!TOKEN){
 
-    errorEl.textContent =
-      'LINE 預約連結尚未建立。';
+    showError(
+      'LINE 預約身分尚未建立，請重新開啟預約頁面。'
+    );
 
     return;
 
   }
 
 
-  submitBtn.disabled = true;
+  button.disabled = true;
 
-  submitBtn.textContent =
+  button.textContent =
     '預約處理中…';
 
 
   try{
 
     const url =
-      GAS_API +
+      GAS_API_URL +
       '?api=submitBooking' +
+
       '&name=' +
       encodeURIComponent(name) +
+
       '&phone=' +
       encodeURIComponent(cleanPhone) +
+
       '&start=' +
       encodeURIComponent(start) +
+
       '&token=' +
       encodeURIComponent(TOKEN);
 
 
+    const response =
+      await fetch(url);
+
+
+    if(!response.ok){
+
+      throw new Error(
+        '預約 API 錯誤：' +
+        response.status
+      );
+
+    }
+
+
     const result =
-      await jsonp(url);
+      await response.json();
 
 
     console.log(
-      'submitBooking:',
+      'submitBooking result:',
       result
     );
 
 
-    if(
-      !result ||
-      !result.ok
-    ){
+    if(!result.ok){
 
       throw new Error(
-        result?.error ||
+        result.error ||
         '預約失敗'
       );
 
     }
 
 
-    document
-      .getElementById('formCard')
-      .style.display =
+    /*
+     * 顯示成功畫面
+     */
+
+    document.getElementById(
+      'formCard'
+    ).style.display =
       'none';
 
 
-    document
-      .getElementById('successCard')
-      .style.display =
+    document.getElementById(
+      'successCard'
+    ).style.display =
       'block';
 
 
-    document
-      .getElementById('successText')
-      .innerHTML =
+    document.getElementById(
+      'successText'
+    ).innerHTML =
 
       '預約編號：<strong>' +
       result.bookingNo +
@@ -712,40 +790,45 @@ async function submitBooking(){
 
   }
 
-  catch(err){
+  catch(error){
 
-    console.error(err);
+    console.error(
+      'submitBooking 錯誤',
+      error
+    );
 
-    errorEl.textContent =
-      err.message ||
-      '預約失敗，請重新選擇時段。';
+
+    showError(
+      '❌ 預約失敗：\n' +
+      (error.message || error)
+    );
 
 
-    submitBtn.disabled = false;
+    button.disabled = false;
 
-    submitBtn.textContent =
+    button.textContent =
       '確認預約';
 
 
-    try{
+    /*
+     * 重新取得最新時段
+     */
 
-      await loadSlots();
-
-    }catch(e){}
+    loadSlots();
 
   }
 
 }
 
 
-/* ================================
+
+/* =====================================================
    啟動
-================================ */
+===================================================== */
 
 initLIFF();
 
 </script>
 
 </body>
-
 </html>
