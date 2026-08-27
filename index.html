@@ -664,10 +664,8 @@ async function submitBooking() {
   try {
 
     const url =
-      'https://script.google.com/macros/s/' +
-      'AKfycbyvvtOVFJPce3CdEZJ7QEfdnm0Ia6nziNpDN42_uhkfbersVE534Ty8tFJ1Sc1ku_xy' +
-      '/exec';
-
+     GAS_API_URL;
+    
     const params = new URLSearchParams();
 
     params.append('api', 'submitBooking');
